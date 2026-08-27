@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>A Little Surprise For You</title>
+<style>
+:root{--gold:#ffd66b;--pink:#ff79c8;--bg:#050308}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font-family:Georgia,"Times New Roman",serif}
+body{touch-action:pan-y}
+button{font:inherit}
+.screen{position:fixed;inset:0;display:grid;place-items:center;opacity:0;visibility:hidden;transition:opacity .7s ease;overflow:hidden}
+.screen.active{opacity:1;visibility:visible}
+.bg{position:absolute;inset:-5%;background:
+ radial-gradient(circle at 20% 20%,rgba(255,170,220,.23),transparent 17%),
+ radial-gradient(circle at 75% 30%,rgba(170,130,255,.18),transparent 22%),
+ radial-gradient(circle at 50% 80%,rgba(255,100,190,.13),transparent 20%),
+ linear-gradient(150deg,#020205,#140817 55%,#030204);
+ filter:blur(1px)}
+.bokeh{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.bokeh i{position:absolute;width:10vmin;height:10vmin;border-radius:50%;background:rgba(255,220,245,.17);filter:blur(12px);animation:float 7s infinite ease-in-out}
+.bokeh i:nth-child(1){left:8%;top:15%;animation-delay:-2s}.bokeh i:nth-child(2){left:65%;top:10%;width:16vmin;height:16vmin;animation-delay:-5s}.bokeh i:nth-child(3){left:45%;top:48%;width:13vmin;height:13vmin;animation-delay:-1s}.bokeh i:nth-child(4){left:80%;top:68%;animation-delay:-4s}.bokeh i:nth-child(5){left:15%;top:72%;width:18vmin;height:18vmin;animation-delay:-3s}
+@keyframes float{50%{transform:translateY(-25px) scale(1.15);opacity:.7}}
+.content{position:relative;z-index:3;width:min(90vw,620px);text-align:center;padding:24px}
+.kicker{font-size:clamp(14px,3.6vw,22px);letter-spacing:.08em;color:#ddd;margin-bottom:8px}
+.title{font-size:clamp(38px,9vw,76px);font-weight:400;margin:0 0 28px;line-height:.95}
+.title em{display:block;color:var(--gold);font-style:italic}
+.open{border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.15);color:#eee;padding:13px 25px;border-radius:999px;cursor:pointer;letter-spacing:.05em;backdrop-filter:blur(5px);transition:.25s}
+.open:hover{transform:translateY(-2px);border-color:var(--gold);color:var(--gold)}
+.hint{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);z-index:4;width:90%;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#bbb}
+
+.hearts{position:absolute;inset:0;pointer-events:none}
+.heart{position:absolute;color:#fff;font-size:18px;animation:rise linear forwards;opacity:.85}
+@keyframes rise{from{transform:translateY(20vh) scale(.6) rotate(0);opacity:0}12%{opacity:1}to{transform:translateY(-110vh) scale(1.4) rotate(35deg);opacity:0}}
+
+.gallery-wrap{position:relative;z-index:3;width:min(90vw,560px);padding:20px;text-align:center}
+.gallery{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:auto;max-width:390px}
+.photo{aspect-ratio:1/1;overflow:hidden;background:#1b1220;cursor:pointer;position:relative}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.photo:hover img{transform:scale(1.04)}
+.gallery-btn{margin-top:28px;color:var(--gold);font-family:Arial,sans-serif;font-weight:700;letter-spacing:.18em;background:none;border:0;cursor:pointer}
+.small{font-family:Arial,sans-serif;color:#aaa;font-size:11px;margin-top:12px}
+
+.modal{position:absolute;inset:0;background:rgba(0,0,0,.28);display:none;place-items:center;z-index:9}
+.modal.show{display:grid}
+.modal-card{width:min(88vw,430px);height:min(78vh,700px);display:flex;flex-direction:column;justify-content:center}
+.modal-card img{width:100%;height:min(62vh,570px);object-fit:contain}
+.close{position:absolute;right:24px;top:22px;width:42px;height:42px;border-radius:50%;border:1px solid #777;background:#222b;color:white;font-size:25px;cursor:pointer}
+.caption{text-align:center;margin-top:12px;font-size:17px}.dots{display:flex;justify-content:center;gap:12px;margin-top:18px}.dot{width:9px;height:9px;border-radius:50%;background:#aaa;border:0;padding:0}.dot.on{background:var(--gold);transform:scale(1.25)}
+
+.fireworks{position:absolute;inset:0;z-index:1}
+canvas{width:100%;height:100%}
+.gift{position:relative;z-index:4;width:110px;height:92px;border-radius:12px;background:linear-gradient(#ff65bd,#ff42a8);box-shadow:0 8px 35px #ff36aa66;cursor:pointer;margin-top:25vh;animation:bounce 1.5s infinite}
+.gift:before{content:"";position:absolute;left:47px;top:0;width:18px;height:100%;background:#ffd83d}.gift:after{content:"";position:absolute;left:0;top:25px;width:100%;height:17px;background:#ffd83d}
+.bow{position:absolute;top:-23px;left:30px;font-size:42px}
+@keyframes bounce{50%{transform:translateY(-10px)}}
+.final{position:relative;z-index:3;width:min(88vw,700px);padding:30px;text-align:left}
+.final h1{font-size:clamp(31px,8vw,58px);font-weight:400;margin:0 0 35px}.final h1 em{font-style:normal;color:#fff}
+.final p{font-family:Arial,sans-serif;font-size:clamp(14px,3.5vw,19px);line-height:1.8;margin:16px 0;max-width:680px}
+.confetti{position:absolute;left:0;right:0;bottom:0;height:95px;display:flex;align-items:end;justify-content:center;gap:2px;font-size:35px;filter:drop-shadow(0 2px 4px #000)}
+.audio{position:fixed;right:16px;bottom:16px;z-index:20;width:40px;height:40px;border-radius:50%;border:1px solid #555;background:#111b;color:#fff;cursor:pointer}
+.file-input{display:none}
+.upload{position:fixed;left:14px;bottom:14px;z-index:20;color:#aaa;font:11px Arial,sans-serif;cursor:pointer}
+.upload span{border:1px solid #555;padding:8px 10px;border-radius:20px;background:#0008}
+@media(max-width:480px){.gallery-wrap{padding:12px}.gallery{max-width:330px}.final{padding:25px}.modal-card{height:78vh}.hint{bottom:12px}}
+</style>
+</head>
+<body>
+<div class="screen active" id="s1">
+  <div class="bg"></div><div class="bokeh"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="content">
+    <div class="kicker">A Little Surprise</div>
+    <h1 class="title"><em>Just For You</em></h1>
+    <button class="open" onclick="go(2)">Open Your Surprise</button>
+  </div>
+  <div class="hint">Geser dari tepi atau gunakan tombol untuk melanjutkan</div>
+</div>
+
+<div class="screen" id="s2">
+  <div class="bg"></div><div class="hearts" id="hearts"></div>
+  <div class="content">
+    <div style="font:700 18px Arial,sans-serif">100% 😍</div>
+    <h2 style="font-size:22px;font-weight:400">You Filled My Heart ❤️</h2>
+  </div>
+</div>
+
+<div class="screen" id="s3">
+  <div class="bg"></div>
+  <div class="gallery-wrap">
+    <div class="gallery" id="gallery"></div>
+    <button class="gallery-btn" onclick="go(4)">OPEN SURPRISE →</button>
+    <div class="small">Tap foto untuk melihat lebih besar</div>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <button class="close" onclick="closeModal()">×</button>
+  <div class="modal-card">
+    <img id="modalImg" alt="">
+    <div class="caption" id="caption"></div>
+    <div class="dots" id="dots"></div>
+  </div>
+</div>
+
+<div class="screen" id="s4">
+  <div class="fireworks"><canvas id="fw"></canvas></div>
+  <button class="gift" onclick="go(5)" aria-label="Buka hadiah"><span class="bow">🎀</span></button>
+  <div style="position:absolute;bottom:10%;z-index:4;color:#bbb;font:12px Arial">Klik hadiahnya 🎁</div>
+</div>
+
+<div class="screen" id="s5">
+  <div class="fireworks"><canvas id="fw2"></canvas></div>
+  <div class="final">
+    <h1>A Little Wish For You</h1>
+    <p>Selamat ulang tahun ya sayang. ❤️</p>
+    <p>Semoga hari ini menjadi awal dari banyak kebahagiaan baru. Semoga semua doa dan harapanmu satu per satu menjadi nyata.</p>
+    <p>Terima kasih sudah menjadi seseorang yang begitu berarti. Semoga selalu sehat, bahagia, dan dikelilingi hal-hal baik.</p>
+  </div>
+  <div class="confetti">🎉 💕 🎂 🎈 🧸 🌸 💝 🎊 💗</div>
+</div>
+
+<label class="upload"><span>📷 Pilih 6 foto</span><input id="photos" class="file-input" type="file" accept="image/*" multiple></label>
+<button class="audio" onclick="toggleAudio()" title="Musik">♪</button>
+
+<script>
+const screens=[...document.querySelectorAll('.screen')];
+let page=1, photoIndex=0;
+const captions=['Senyummu','Cantik seperti biasa','Momen favorit','Bahagia bersamamu','Hari yang indah','Selalu kamu'];
+const fallback=[
+ 'linear-gradient(135deg,#fff0f7,#d7b5ff)','linear-gradient(135deg,#ffe2ef,#ffd67a)',
+ 'linear-gradient(135deg,#7d4a65,#e9a8c8)','linear-gradient(135deg,#d5c1aa,#4d3541)',
+ 'linear-gradient(135deg,#ffd4e8,#fff0c5)','linear-gradient(135deg,#f4c2d8,#9a78a7)'
+];
+let photos=JSON.parse(localStorage.getItem('surprisePhotos')||'null')||[];
+
+function go(n){
+ page=n;
+ screens.forEach((s,i)=>s.classList.toggle('active',i===n-1));
+ if(n===2) startHearts();
+ if(n===4||n===5){startFireworks(n===5?'fw2':'fw')}
+ if(n===3) renderGallery();
+}
+function startHearts(){
+ const box=document.getElementById('hearts');
+ box.innerHTML='';
+ for(let i=0;i<55;i++){
+  const h=document.createElement('span');h.className='heart';h.textContent=['♥','♡','❤'][i%3];
+  h.style.left=Math.random()*100+'%';h.style.bottom=(-10+Math.random()*20)+'%';
+  h.style.fontSize=(10+Math.random()*18)+'px';h.style.animationDuration=(3+Math.random()*5)+'s';
+  h.style.animationDelay=Math.random()*2+'s';box.appendChild(h);
+ }
+ setTimeout(()=>go(3),5200);
+}
+function renderGallery(){
+ const g=document.getElementById('gallery');g.innerHTML='';
+ for(let i=0;i<6;i++){
+  const d=document.createElement('div');d.className='photo';d.style.background=fallback[i];
+  if(photos[i]) d.innerHTML=`<img src="${photos[i]}" alt="Foto ${i+1}">`;
+  else d.innerHTML='<div style="height:100%;display:grid;place-items:center;font:14px Arial;color:#ffffff99">Foto '+(i+1)+'</div>';
+  d.onclick=()=>openModal(i);g.appendChild(d);
+ }
+}
+function openModal(i){photoIndex=i;document.getElementById('modal').classList.add('show');updateModal()}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function updateModal(){
+ const img=document.getElementById('modalImg'), cap=document.getElementById('caption'), dots=document.getElementById('dots');
+ img.src=photos[photoIndex]||'';img.style.display=photos[photoIndex]?'block':'none';
+ cap.textContent=captions[photoIndex];dots.innerHTML='';
+ for(let i=0;i<6;i++){const b=document.createElement('button');b.className='dot '+(i===photoIndex?'on':'');b.onclick=()=>{photoIndex=i;updateModal()};dots.appendChild(b)}
+}
+document.getElementById('photos').addEventListener('change',e=>{
+ const files=[...e.target.files].slice(0,6);
+ if(!files.length)return;
+ Promise.all(files.map(f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result);x.readAsDataURL(f)}))).then(arr=>{
+  photos=arr;localStorage.setItem('surprisePhotos',JSON.stringify(photos));renderGallery();
+ });
+});
+let audioCtx,osc,gain,playing=false;
+function toggleAudio(){
+ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+ if(playing){gain.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+.4);playing=false;return}
+ osc=audioCtx.createOscillator();gain=audioCtx.createGain();osc.type='sine';osc.frequency.value=261.63;gain.gain.value=.0001;
+ osc.connect(gain).connect(audioCtx.destination);osc.start();gain.gain.exponentialRampToValueAtTime(.025,audioCtx.currentTime+.4);playing=true;
+}
+function startFireworks(id){
+ const c=document.getElementById(id),ctx=c.getContext('2d');let W,H;
+ function resize(){W=c.width=innerWidth*devicePixelRatio;H=c.height=innerHeight*devicePixelRatio;ctx.setTransform(1,0,0,1,0,0);ctx.scale(devicePixelRatio,devicePixelRatio);W=innerWidth;H=innerHeight}
+ resize();addEventListener('resize',resize);
+ const ps=[];
+ function burst(){
+  const x=W*(.15+.7*Math.random()),y=H*(.15+.45*Math.random()),n=55+Math.random()*45;
+  for(let i=0;i<n;i++){const a=Math.PI*2*i/n,s=1.2+Math.random()*3;ps.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1})}
+ }
+ let last=0;
+ function loop(t){
+  ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(0,0,W,H);
+  if(t-last>650){burst();last=t}
+  for(let i=ps.length-1;i>=0;i--){const p=ps[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.025;p.life-=.012;ctx.fillStyle=`rgba(255,220,245,${p.life})`;ctx.fillRect(p.x,p.y,2,2);if(p.life<=0)ps.splice(i,1)}
+  requestAnimationFrame(loop)
+ }
+ requestAnimationFrame(loop)
+}
+let sx=0;
+addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(dx<-60&&page<5)go(page+1);if(dx>60&&page>1)go(page-1)},{passive:true});
+renderGallery();
+</script>
+</body>
+</html>
